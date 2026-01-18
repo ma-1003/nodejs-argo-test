@@ -13,11 +13,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 新增步骤：在 Ubuntu 环境下安装 Heroku CLI
+      # 第一步：安装 Heroku CLI 
       - name: Install Heroku CLI
         run: |
           curl https://cli-assets.heroku.com/install.sh | sh
 
+      # 第二步：强制设置 Heroku 运行环境为 Container 模式（修复 Release 失败的关键）
+      - name: Set Heroku Stack to Container
+        run: |
+          heroku stack:set container -a ${{ secrets.HEROKU_APP_NAME }}
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+
+      # 第三步：构建并发布
       - name: Build and Push Docker Image to Heroku
         uses: gonuit/heroku-docker-deploy@v1.3.3
         with:
