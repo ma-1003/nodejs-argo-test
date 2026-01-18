@@ -1,18 +1,24 @@
-name: Auto Deploy to Heroku
+name: Deploy to Heroku
 
 on:
-  workflow_dispatch: # 支持手动点击运行
   push:
-    branches: [ main ] # 每次推代码到 main 都会部署
+    branches:
+      - main
+  workflow_dispatch: # 允许手动点击运行
 
 jobs:
-  heroku-deploy:
+  deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Deploy Docker Image
+      # 新增步骤：在 Ubuntu 环境下安装 Heroku CLI
+      - name: Install Heroku CLI
+        run: |
+          curl https://cli-assets.heroku.com/install.sh | sh
+
+      - name: Build and Push Docker Image to Heroku
         uses: gonuit/heroku-docker-deploy@v1.3.3
         with:
           email: ${{ secrets.HEROKU_EMAIL }}
